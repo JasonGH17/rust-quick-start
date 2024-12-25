@@ -13,5 +13,7 @@ sqlx = { workspace = true, features = [
     "macros",
     "migrate",
 ] }
-lib-data = { path = "../../lib/lib-data" }
 tokio.workspace = true
+
+lib-auth = { path = "../../lib/lib-auth" }
+lib-data = { path = "../../lib/lib-data" }

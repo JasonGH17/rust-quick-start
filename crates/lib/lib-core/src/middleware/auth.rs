@@ -55,7 +55,7 @@ where
 
                     log::debug!("Authorization results: Authorized user - id: {}", uid);
 
-                    if user.first_login && req.uri.path() != "/fl" {
+                    if user.first_login && !req.uri.path().ends_with("/fl") {
                         return Err(Response::builder()
                             .status(StatusCode::FOUND)
                             .header(header::LOCATION, "/fl")

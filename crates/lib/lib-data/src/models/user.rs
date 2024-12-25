@@ -56,7 +56,7 @@ mod dto {
     #[derive(Debug, Clone, Deserialize)]
     #[serde(rename_all = "camelCase")]
     pub struct CreateUserData {
-        pub creator_id: i32,
+        pub creator_id: Option<i32>,
         pub email: String,
         pub password: String,
     }

@@ -1,14 +1,13 @@
 use axum::{
-    body::Body,
     extract::{Query, State},
-    http::{Response, StatusCode},
+    http::StatusCode,
     response::IntoResponse,
     routing::post,
-    Json, Router,
+    Form, Json, Router,
 };
 use lib_auth::helper::{generate_password_and_jwt, verify_password_and_generate_jwt};
 use lib_data::{
-    auth::{LoginActions, LoginData},
+    auth::{FLData, LoginActions, LoginData},
     user::UserBmc,
 };
 use tower_cookies::cookie::time::Duration;
@@ -26,7 +25,7 @@ async fn post_login(
     State(state): State<AppState>,
     cookies: Cookies,
     Query(actions): Query<LoginActions>,
-    Json(LoginData { email, password }): Json<LoginData>,
+    Form(LoginData { email, password }): Form<LoginData>,
 ) -> ApiResult<impl IntoResponse> {
     let user = UserBmc::find_by_email(&state.mm, &email).await;
 
@@ -47,9 +46,7 @@ async fn post_login(
         return Err(StatusCode::NOT_FOUND);
     }
 
-    let claims = lib_auth::JwtCustomClaims {
-        uid: user.id
-    };
+    let claims = lib_auth::JwtCustomClaims { uid: user.id };
 
     let jwt = verify_password_and_generate_jwt(claims, password, user.password_hash)
         .await
@@ -72,16 +69,12 @@ async fn post_login(
     cookies.add(cookie);
 
     let redirect = if user.first_login {
-        Some("/fl".into())
+        "/fl".into()
     } else {
-        actions.redirect
+        actions.redirect.unwrap_or("/admin".into())
     };
 
-    Ok(Response::builder()
-        .status(StatusCode::OK)
-        .header("REDIRECT", redirect.unwrap_or("/".into()))
-        .body(Body::empty())
-        .unwrap())
+    Ok(Json(redirect))
 }
 
 async fn delete_login(
@@ -104,19 +97,15 @@ async fn delete_login(
 async fn post_first_login(
     AuthUser(user): AuthUser,
     State(state): State<AppState>,
-    Json(new_password): Json<String>,
+    Form(FLData { new_password }): Form<FLData>,
 ) -> ApiResult<impl IntoResponse> {
-    let (hash, _) = generate_password_and_jwt(
-        lib_auth::JwtCustomClaims {
-            uid: user.id
-        },
-        new_password,
-    )
-    .await
-    .map_err(|e| {
-        log::error!("Could not generate new hash-jwt pair: {e:?}");
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    let (hash, _) =
+        generate_password_and_jwt(lib_auth::JwtCustomClaims { uid: user.id }, new_password)
+            .await
+            .map_err(|e| {
+                log::error!("Could not generate new hash-jwt pair: {e:?}");
+                StatusCode::INTERNAL_SERVER_ERROR
+            })?;
 
     UserBmc::set_password_by_id(&state.mm, user.id, hash)
         .await
@@ -132,9 +121,5 @@ async fn post_first_login(
             StatusCode::INTERNAL_SERVER_ERROR
         })?;
 
-    Ok(Response::builder()
-        .status(StatusCode::OK)
-        .header("REDIRECT", "/")
-        .body(Body::empty())
-        .unwrap())
+    Ok(Json("/admin"))
 }

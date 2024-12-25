@@ -1,4 +1,5 @@
-use lib_data::create_database_pool;
+use lib_auth::scheme::argon::ArgonScheme;
+use lib_data::{create_database_pool, ModelManager};
 use tools::MIGRATOR;
 
 #[derive(serde::Deserialize)]
@@ -36,6 +37,20 @@ async fn main() -> Result<(), Error> {
     println!("Initialized database pool");
 
     MIGRATOR.run(&pool).await.map_err(Error::Sqlx)?;
+
+    ArgonScheme::init_instance("TEMP_SECRET");
+
+    let mm = ModelManager::new_from_pool(pool);
+    lib_data::user::UserBmc::create(
+        &mm,
+        lib_data::user::CreateUserData {
+            creator_id: None,
+            email: "admin@localhost".to_string(),
+            password: "P@ssw0rd".to_string(),
+        },
+    )
+    .await
+    .expect("Could not create base admin user");
 
     println!("Applied migrations successfully");
 

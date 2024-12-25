@@ -23,15 +23,17 @@ pub fn initialize(app_state: state::AppState) -> Router {
     };
 
     let app_service = move |auth: Option<AuthUser>, req: Request<Body>| async move {
+        let uri = req.uri().to_string();
+
         if auth.is_none()
-            && req.uri() != "/login"
-            && req.uri() != "/fl"
-            && !req.uri().to_string().starts_with("/assets")
+            && uri != "/login"
+            && uri != "/fl"
+            && !uri.starts_with("/assets")
         {
             return Redirect::permanent("/login").into_response();
         }
 
-        let res = match req.uri().to_string().as_str() {
+        let res = match &uri {
             s if s.contains(".") => ServeDir::new(serve_dir).oneshot(req).await,
             _ => {
                 ServeFile::new(format!("{serve_dir}/index.html"))

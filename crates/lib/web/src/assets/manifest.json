@@ -1,0 +1,30 @@
+{
+  "name": "Employee Management System",
+  "short_name": "EMS",
+  "start_url": "/employee",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/icons/96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "/icons/128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/icons/385.png",
+      "type": "image/png",
+      "sizes": "385x385"
+    },
+    {
+      "src": "/icons/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "background_color": "#283b6f",
+  "theme_color": "#283b6f"
+}

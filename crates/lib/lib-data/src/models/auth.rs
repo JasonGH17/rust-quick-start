@@ -10,3 +10,9 @@ pub struct LoginData {
     pub email: String,
     pub password: String,
 }
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FLData {
+    pub new_password: String
+}
