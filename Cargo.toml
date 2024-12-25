@@ -2,6 +2,7 @@
 [workspace]
 members = [
     "./crates/bin/server",
+    "./crates/bin/tools",
     "./crates/lib/lib-core",
     "./crates/lib/lib-auth",
     "./crates/lib/lib-data",
