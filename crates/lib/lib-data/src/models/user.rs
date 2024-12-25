@@ -29,6 +29,12 @@ mod dto {
         pub last_login_at: DateTimeLocal,
     }
 
+    #[derive(Debug, Clone, Serialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct UserMeData {
+        pub email: String,
+    }
+
     impl From<User> for PartialUser {
         fn from(
             User {
@@ -50,6 +56,12 @@ mod dto {
                 is_active,
                 last_login_at,
             }
+        }
+    }
+
+    impl From<PartialUser> for UserMeData {
+        fn from(value: PartialUser) -> Self {
+            UserMeData { email: value.email }
         }
     }
 

@@ -12,6 +12,7 @@ use tower_http::services::{ServeDir, ServeFile};
 use crate::{middleware::auth::AuthUser, state};
 
 mod auth;
+mod user;
 
 pub fn initialize(app_state: state::AppState) -> Router {
     let serve_dir = if std::env::var("CARGO").is_ok() {
@@ -47,6 +48,7 @@ pub fn initialize(app_state: state::AppState) -> Router {
 
     Router::new()
         .nest("/api/login", auth::initialize_routes())
+        .nest("/api/user", user::initialize_routes())
         .fallback_service(app_service.with_state(app_state.clone()))
         .layer(CookieManagerLayer::new())
         .with_state(app_state)
