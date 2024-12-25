@@ -1,0 +1,21 @@
+[package]
+name = "lib-logs"
+version = "0.1.0"
+edition.workspace = true
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lib]
+doctest = false
+
+[dependencies]
+log = { workspace = true, features = ["std"] }
+chrono = "0.4.38"
+
+[dev-dependencies]
+criterion = { version = "0.5.1", features = ["html_reports"] }
+
+[[bench]]
+name = "log_bench"
+harness = false

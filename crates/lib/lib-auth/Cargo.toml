@@ -1,0 +1,16 @@
+[package]
+name = "lib-auth"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+
+[dependencies]
+argon2 = "0.5.3"
+jwt-simple = { version = "0.12.10", default-features = false, features = [
+    "pure-rust",
+] }
+log = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+tokio = { workspace = true }
